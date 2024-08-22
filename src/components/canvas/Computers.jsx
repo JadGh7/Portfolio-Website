@@ -5,47 +5,74 @@ import CanvasLoader from "../Loader";
 
 
 
-const Computers = () => {
+const Computers = ({isMobile}) => {
 
-  const computer = useGLTF("./desktop_pc/scene.gltf");
+  const computer = useGLTF("./desktop_pc/scene.gltf"); //loads the 3D model
   return (
-    <mesh>
-      <hemisphereLight intensity={0.15} groundColor='black' />
-      <spotLight
-        position={[-20, 50, 10]}
+    <mesh> {/*this represents the 3d model*/}
+      <hemisphereLight intensity={4} groundColor='black' /> {/*represents the light*/}
+      <spotLight //add light to the model
+        position={[-20, 50, 10]} //position of this light
         angle={0.12}
         penumbra={1}
         intensity={1}
-        castShadow
+        castShadow //will cast a shadow
         shadow-mapSize={1024}
-      />
-      <pointLight intensity={1} />
+      /> {/* light that makes a shadow*/}
+      <pointLight intensity={1} /> {/* like a light bulb*/}
       <primitive
         object={computer.scene}
-
+        scale={isMobile ? 0.35 : 0.75} // Try a smaller scale for mobile
+        position={isMobile ? [0, -2, -0.5] : [0, -3.25, -1.5]} // Adjust position for mobile
+        rotation={[-0.01, -0.2, -0.1]}
       />
+ {/* renders a non-react component*/}
     </mesh>
   );
 }
 
 const ComputersCanvas = () => {
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Add a listener for changes to the screen size
+    const mediaQuery = window.matchMedia("(max-width: 500px)");
+
+    // Set the initial value of the `isMobile` state variable
+    setIsMobile(mediaQuery.matches);
+
+    // Define a callback function to handle changes to the media query
+    const handleMediaQueryChange = (event) => {
+      setIsMobile(event.matches);
+    };
+
+    // Add the callback function as a listener for changes to the media query
+    mediaQuery.addEventListener("change", handleMediaQueryChange);
+
+    // Remove the listener when the component is unmounted
+    return () => {
+      mediaQuery.removeEventListener("change", handleMediaQueryChange);
+    };
+  }, []);
+
   return (
     <Canvas
-      frameloop='demand'
-      shadows
-      camera={{ position: [20, 3, 5], fov: 25 }}
+      frameloop='demand' //renders the figure only when necessary for better performance
+      shadows // enables shadows
+      camera={{ position: [20, 3, 5], fov: 25 }} //camera position and field of view
       gl={{ preserveDrawingBuffer: true }}
     
     >
-        <Suspense fallback={<CanvasLoader />}>
+        <Suspense fallback={<CanvasLoader />}> {/* handles loading, will show canvasloader when there's any fallback*/}
         <OrbitControls
-          enableZoom={false}
-          maxPolarAngle={Math.PI / 2}
+          enableZoom={false} //disables zoom
+          maxPolarAngle={Math.PI / 2} // this keeps rotation only horizontal
           minPolarAngle={Math.PI / 2}
         />
-        <Computers />
+        <Computers isMobile={isMobile}/>
       </Suspense>
-      <Preload all />
+      <Preload all /> {/* loads everything before the scene is displayed*/}
     </Canvas>
   )
 }
