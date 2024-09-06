@@ -20,13 +20,12 @@ const Computers = ({isMobile}) => {
         shadow-mapSize={1024}
       /> {/* light that makes a shadow*/}
       <pointLight intensity={1} /> {/* like a light bulb*/}
-      <primitive
+      <primitive // renders the 3d model
         object={computer.scene}
         scale={isMobile ? 0.35 : 0.75} // Try a smaller scale for mobile
         position={isMobile ? [0, -2, -0.5] : [0, -3.25, -1.5]} // Adjust position for mobile
         rotation={[-0.01, -0.2, -0.1]}
       />
- {/* renders a non-react component*/}
     </mesh>
   );
 }
